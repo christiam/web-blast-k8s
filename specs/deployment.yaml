@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webblast-deployment
+  #namespace: blast
+  labels:
+    app: webblast
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webblast
+  template:
+    metadata:
+      labels:
+        app: webblast
+    spec:
+      volumes:
+      - name: webblast-dbs
+        persistentVolumeClaim:
+            claimName: webblast-dbs-pvc
+      - name: shared-data
+        emptyDir: {}
+      containers:
+      - name: webblast
+        image: christiam/webblast:0.2
+        ports:
+          - containerPort: 80
+        volumeMounts:
+        - name: webblast-dbs
+          mountPath: /blast/blastdb
+        - name: shared-data
+          mountPath: /blast/spool
+  revisionHistoryLimit: 2

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: webblast-svc
+  labels:
+    app: webblast
+spec:
+  selector:
+    app: webblast
+  type: LoadBalancer
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
