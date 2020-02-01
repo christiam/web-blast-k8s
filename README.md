@@ -31,4 +31,5 @@ To shutdown all the resources instantiated by this demo, run `make distclean`.
 
 ## Requirements
 
+* [webblast docker image](https://hub.docker.com/repository/docker/christiam/webblast)
 * [envsubst](https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html) from the GNU gettext utilities package
