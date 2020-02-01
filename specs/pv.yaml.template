@@ -5,9 +5,9 @@ metadata:
 spec:
   storageClassName: ""
   capacity:
-    storage: 100G
+    storage: ${PD_SIZE}
   accessModes:
     - ReadOnlyMany
   gcePersistentDisk:
-    pdName: test-cluster-camacho-pd
+    pdName: test-cluster-${USER}-pd
     fsType: ext4

@@ -29,6 +29,7 @@ spec:
         volumeMounts:
         - name: webblast-dbs
           mountPath: /blast/blastdb
+          readOnly: true
         - name: shared-data
           mountPath: /blast/spool
   revisionHistoryLimit: 2
