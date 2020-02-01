@@ -2,18 +2,17 @@
 # Script to set up a persistent disk with BLASTDBs
 
 name=${1:-"$USER-test"}
-blast_docker=ncbi/blast
-create_date=$(date -Iseconds | tr : - | tr "[:upper:]" "[:lower:]")
+blast_docker=ncbi/blast:latest
+create_date=$(date +%F-%T | tr : - )
 labels="created=${create_date},owner=${USER},project=elastic-blast,maintainer=camacho,creator=${USER}"
 zone=${2:-"us-east4-b"}
 mtype=n1-standard-32
-mtype=n1-standard-8
-disk_size=100GB
+disk_size=${3:-"1000GB"}
 disk_type=pd-ssd
 #disk_type=pd-standard
 mount_dir=/mnt/disks/blast_dbs
-blast_dbs="nt nr"
-blast_dbs=swissprot
+blast_dbs="nt nr swissprot"
+#blast_dbs=swissprot
 
 # create persistent dis:
 time gcloud compute disks create --size=$disk_size --zone=$zone $name-pd --labels $labels --type $disk_type
