@@ -24,3 +24,6 @@ Afterwards run `make all` to:
 * show k8s cluster information
 * Check that the web application is running.
 
+## Requirements
+
+* [envsubst](https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html) from the GNU gettext utilities package
