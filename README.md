@@ -24,6 +24,11 @@ Afterwards run `make all` to:
 * show k8s cluster information
 * Check that the web application is running.
 
+To see the web application, point your web browser to the IP address provided
+by the output of the command `make ip`.
+
+To shutdown all the resources instantiated by this demo, run `make distclean`.
+
 ## Requirements
 
 * [envsubst](https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html) from the GNU gettext utilities package
