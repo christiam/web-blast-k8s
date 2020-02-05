@@ -52,3 +52,4 @@ The following application/cluster elements can be configured; most of these are 
 * [webblast docker image](https://hub.docker.com/repository/docker/christiam/webblast)
 * [envsubst](https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html) from the GNU gettext utilities package
 * [GNU make](https://www.gnu.org/software/make/)
+* [git](https://git-scm.com/)
