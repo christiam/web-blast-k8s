@@ -4,28 +4,21 @@ This experimental demo allows one to run BLAST on a single-node GCP kubernetes c
 interface. BLASTDBs are pre-loaded on a persistent disk and made available to
 the cluster.
 
-## Developer notes
-
-* The script `setup-blastdbs-pd.sh` hard codes the names of the BLAST
-  databases to show. Please update these if needed. These must be available to
-  the `update_blastdb.pl` script for
-  [BLAST+](https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs&DOC_TYPE=Download).
-
 ## Instructions
 
-These should work on the GCP cloud shell or a machine with kubectl, docker and
-the GCP CLI SDK.
+These should work on the GCP cloud shell or a machine with kubectl, docker,
+make, envsubst, and the GCP CLI SDK.
 
 1. Clone this repo: `git clone https://github.com/christiam/web-blast-k8s`
 1. `cd web-blast-k8s`
 1.  Please set the `GCP_PROJECT`, `GCP_REGION` and `GCP_ZONE` values in the
 `Makefile`.
 1. Run `make all`. This will
-  1. create the cluster
-  1. set up the persistent disk
-  1. deploy the application
-  1. show k8s cluster information
-  1. Check that the web application is running.
+   1. create the cluster
+   1. set up the persistent disk
+   1. deploy the application
+   1. show k8s cluster information
+   1. Check that the web application is running.
 1. To see the web application, point your web browser to the IP address provided
 by the output of the command `make ip`.
 1. To shutdown all the resources instantiated by this demo, run `make distclean`.
@@ -35,13 +28,19 @@ your unix user name. The persistent disk will be named `test-cluster-$USER-pd`.
 
 ### Configuration
 
-The following cluster elements can be configured, most of these are `Makefile` variables:
+The following application/cluster elements can be configured, most of these are `Makefile` variables:
 
 * `MTYPE`: Machine type to use in the cluster.
 * `PD_SIZE`: Size of the persistent disk to initialize.
-* 
 * `blast_dbs` in `setup-blastdbs-pd.sh`: BLASTDBs to download into the
   persistent disk.
+
+### Developer notes
+
+* The script `setup-blastdbs-pd.sh` hard codes the names of the BLAST
+  databases to show. Please update these if needed. These must be available to
+  the `update_blastdb.pl` script from
+  [BLAST+](https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs&DOC_TYPE=Download).
 
 ## Requirements
 
