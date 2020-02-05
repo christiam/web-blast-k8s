@@ -4,7 +4,7 @@
 SHELL=/bin/bash
 .PHONY: all clean distclean check
 
-GCP_PROJECT=camacho
+GCP_PROJECT=
 GCP_REGION=us-east4
 GCP_ZONE=us-east4-b
 
