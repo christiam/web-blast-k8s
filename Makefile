@@ -4,7 +4,7 @@
 SHELL=/bin/bash
 .PHONY: all clean distclean check
 
-GCP_PROJECT=
+GCP_PROJECT=camacho
 GCP_REGION=us-east4
 GCP_ZONE=us-east4-b
 
@@ -13,7 +13,7 @@ SERVICE_NAME=$(shell awk -F: '/name:/ {print $$2}' specs/svc.yaml | head -1)
 
 CLUSTER_NAME?=test-cluster-${USER}
 DISK_NAME=${CLUSTER_NAME}-pd
-NUM_NODES?=2	# GCP default is 3
+NUM_NODES?=1	# GCP default is 3
 PD_SIZE?=1000G	# needed for nr, nt, swissprot, defined in setup-blastdbs-pd.sh
 MTYPE=n1-standard-32
 
@@ -86,5 +86,5 @@ show:
 
 # Note: this doesn't work well right now, as the volumes are not set properly
 # for all pods to share the spool area
-scale:
-	kubectl scale --replicas=${NUM_NODES} -f specs/deployment.yaml
+#scale:
+#	kubectl scale --replicas=${NUM_NODES} -f specs/deployment.yaml

@@ -11,8 +11,8 @@ disk_size=${3:-"1000GB"}
 disk_type=pd-ssd
 #disk_type=pd-standard
 mount_dir=/mnt/disks/blast_dbs
-blast_dbs="nt nr swissprot"
-#blast_dbs=swissprot
+#blast_dbs="nt nr swissprot"
+blast_dbs=swissprot
 
 # create persistent dis:
 time gcloud compute disks create --size=$disk_size --zone=$zone $name-pd --labels $labels --type $disk_type
