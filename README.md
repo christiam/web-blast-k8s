@@ -7,7 +7,8 @@ the cluster.
 ## Instructions
 
 These should work on the GCP cloud shell or a machine with kubectl, docker,
-make, envsubst, and the GCP CLI SDK.
+git, make, envsubst, and the GCP CLI SDK. This assumes the necessary GCP
+account roles/permissions are set (e.g.: GCE, GKE).
 
 1. Clone this repo: `git clone https://github.com/christiam/web-blast-k8s`
 1. `cd web-blast-k8s`
@@ -19,8 +20,9 @@ make, envsubst, and the GCP CLI SDK.
    1. deploy the application
    1. show k8s cluster information
    1. Check that the web application is running.
-1. To see the web application, point your web browser to the IP address provided
-by the output of the command `make ip`.
+1. To access the web application, point your web browser to the IP address provided
+by the output of the command `make ip`. This webapp supports the [NCBI Common
+URL API](https://ncbi.github.io/blast-cloud/dev/api.html).
 1. To shutdown all the resources instantiated by this demo, run `make distclean`.
 
 By default the resulting k8s cluster will be named `test-cluster-$USER`, where `$USER` is
@@ -28,7 +30,7 @@ your unix user name. The persistent disk will be named `test-cluster-$USER-pd`.
 
 ### Configuration
 
-The following application/cluster elements can be configured, most of these are `Makefile` variables:
+The following application/cluster elements can be configured; most of these are `Makefile` variables:
 
 * `MTYPE`: Machine type to use in the cluster.
 * `PD_SIZE`: Size of the persistent disk to initialize.
