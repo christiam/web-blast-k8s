@@ -8,8 +8,8 @@ GCP_PROJECT=camacho
 GCP_REGION=us-east4
 GCP_ZONE=us-east4-b
 
-DEPLOYMENT_NAME=$(shell awk -F: '/name:/ {print $$2}' specs/deployment.yaml | head -1)
-SERVICE_NAME=$(shell awk -F: '/name:/ {print $$2}' specs/svc.yaml | head -1)
+DEPLOYMENT_NAME=$(shell awk '/name:/ {print $$2}' specs/deployment.yaml | head -1)
+SERVICE_NAME=$(shell awk '/name:/ {print $$2}' specs/svc.yaml | head -1)
 
 CLUSTER_NAME?=test-cluster-${USER}
 DISK_NAME=${CLUSTER_NAME}-pd
