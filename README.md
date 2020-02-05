@@ -19,7 +19,8 @@ account roles/permissions are set (e.g.: GCE, GKE).
    1. set up the persistent disk
    1. deploy the application
    1. show k8s cluster information
-   1. Check that the web application is running.
+   1. Check that the web application is running (note that it may take a
+      minute to set this up).
 1. To access the web application, point your web browser to the IP address provided
 by the output of the command `make ip`. This webapp supports the [NCBI Common
 URL API](https://ncbi.github.io/blast-cloud/dev/api.html).
