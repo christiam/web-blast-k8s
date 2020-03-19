@@ -62,7 +62,7 @@ deploy: specs/pv.yaml specs/pvc.yaml
 # Show the cluster's primary IP address
 .PHONY: ip
 ip:
-	echo $(shell kubectl get service ${SERVICE_NAME} -o json | jq  -r .status.loadBalancer.ingress[0].ip)
+	@echo $(shell kubectl get service ${SERVICE_NAME} -o json | jq  -r .status.loadBalancer.ingress[0].ip)
 
 check:
 	curl -s http://$(shell kubectl get service ${SERVICE_NAME} -o json | jq  -r .status.loadBalancer.ingress[0].ip)
