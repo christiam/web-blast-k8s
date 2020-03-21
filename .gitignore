@@ -1,2 +1,2 @@
-specs/pv.yaml
 specs/pvc.yaml
+specs/job-init-pv.yaml

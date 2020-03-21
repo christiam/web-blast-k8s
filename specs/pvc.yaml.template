@@ -3,13 +3,10 @@ kind: PersistentVolumeClaim
 metadata:
   name: webblast-dbs-pvc
 spec:
-  # It's necessary to specify "" as the storageClassName
-  # so that the default storage class won't be used, see
-  # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
-  storageClassName: ""
-  volumeName: webblast-dbs
+  storageClassName: "gcp-pd"
   accessModes:
     - ReadOnlyMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: ${PD_SIZE}

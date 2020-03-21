@@ -4,42 +4,48 @@
 SHELL=/bin/bash
 .PHONY: all clean distclean check
 
-GCP_PROJECT=
-GCP_REGION=us-east4
-GCP_ZONE=us-east4-b
+GCP_PROJECT?=camacho
+GCP_REGION?=us-east4
+GCP_ZONE?=us-east4-b
 
 DEPLOYMENT_NAME=$(shell awk '/name:/ {print $$2}' specs/deployment.yaml | head -1)
 SERVICE_NAME=$(shell awk '/name:/ {print $$2}' specs/svc.yaml | head -1)
 
 CLUSTER_NAME?=test-cluster-${USER}
-DISK_NAME=${CLUSTER_NAME}-pd
 NUM_NODES?=1	# GCP default is 3
-PD_SIZE?=1000G	# needed for nr, nt, swissprot, defined in setup-blastdbs-pd.sh
+PD_SIZE?=1G
+DB?=swissprot
 MTYPE=n1-standard-32
 
 USE_PREEMPTIBLE=1
 VPATH=specs
 
 %.yaml: %.yaml.template
-	PD_SIZE=${PD_SIZE} envsubst < $< > $@
+	DB=${DB} \
+	PD_SIZE=${PD_SIZE} \
+	envsubst < $< > $@
 
 ifdef USE_PREEMPTIBLE
 PREEMPTIBLE=--preemptible
 endif
 
-all: setup_pd create_cluster deploy show check
-	kubectl get all
+all: deploy check
+	make k8s
+	echo "Don't forget to run make clean to clean up"
+
+all_gcp: create_cluster deploy show check
+	make k8s
 	echo "Don't forget to run make distclean to clean up"
+
+.PHONY: k8s
+k8s:
+	kubectl get pv,pvc,job,pod,deploy,svc,sc -o wide 
 
 .PHONY: init
 init:
 	gcloud config set project ${GCP_PROJECT}
 	gcloud config set compute/zone ${GCP_ZONE}
 	gcloud config set compute/region ${GCP_REGION}
-
-.PHONY: setup_pd
-setup_pd: init
-	./setup-blastdbs-pd.sh ${CLUSTER_NAME} ${GCP_ZONE} ${PD_SIZE}
 
 # N.B.: times are in UTC
 .PHONY: create_cluster
@@ -56,30 +62,42 @@ create_cluster: init
 
 # Create the k8s deployment and create a k8s service to expose the deployment to the world
 .PHONY: deploy
-deploy: specs/pv.yaml specs/pvc.yaml
-	kubectl apply -f specs
+deploy: specs/pvc.yaml specs/job-init-pv.yaml
+	kubectl apply -f <(grep -v storageClassName $<)
+	kubectl apply -f specs/job-init-pv.yaml
+	kubectl wait --for=condition=complete -f specs/job-init-pv.yaml
+	kubectl apply -f specs/svc.yaml
+	kubectl apply -f specs/deployment.yaml
 
 # Show the cluster's primary IP address
+# FIXME: allow hostaname, if IP is null
 .PHONY: ip
 ip:
-	@echo $(shell kubectl get service ${SERVICE_NAME} -o json | jq  -r .status.loadBalancer.ingress[0].ip)
+	@echo $(shell kubectl get svc ${SERVICE_NAME} -o json | jq  -r '.status.loadBalancer.ingress[0] | ( .hostname, .ip )' | grep -v null)
 
 check:
-	curl -s http://$(shell kubectl get service ${SERVICE_NAME} -o json | jq  -r .status.loadBalancer.ingress[0].ip)
+	curl -s http://$(shell kubectl get svc ${SERVICE_NAME} -o json | jq -r '.status.loadBalancer.ingress[0] | .hostname, .ip' | grep -v null)
+	-kubectl delete -f specs/job-show-blastdbs.yaml
+	kubectl apply -f specs/job-show-blastdbs.yaml
+	kubectl wait --for=condition=complete -f specs/job-show-blastdbs.yaml
+	kubectl get pod -o name -l app=test | xargs -t -I{} -n1 kubectl logs {} --timestamps
+	curl -s "http://$(shell kubectl get svc ${SERVICE_NAME} -o json | jq -r '.status.loadBalancer.ingress[0] | .hostname, .ip' | grep -v null)/cgi-bin/blast.cgi?CMD=DisplayRIDs"
+
+logs:
+	kubectl get pod -o name -l app=setup | xargs -t -I{} -n1 kubectl logs {} --timestamps
+	kubectl get pod -o name -l app=test | xargs -t -I{} -n1 kubectl logs {} --timestamps
+	kubectl get pod -o name -l app=webblast | xargs -t -I{} -n1 kubectl logs {} --timestamps
 
 clean:
 	-kubectl delete -f specs
+	${RM} specs/job-init-pv.yaml specs/pvc.yaml
 
 distclean: clean init
 	-yes | gcloud container clusters delete ${CLUSTER_NAME}
-	-yes | gcloud compute disks delete ${DISK_NAME}
 
 .PHONY: show
-show:
+show: k8s
 	-kubectl describe -f specs
-	-kubectl get pods -l app=webblast
-	-kubectl get all -l app=webblast
-	-kubectl get all
 	-gcloud container clusters list
 	-gcloud compute instances list
 	-gcloud compute disks list

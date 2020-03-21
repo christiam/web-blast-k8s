@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: show-blastdbs
+  labels:
+    app: test
+spec:
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      volumes:
+      - name: blast-dbs
+        persistentVolumeClaim:
+            claimName: webblast-dbs-pvc
+            readOnly: true
+      containers:
+      - name: blast
+        image: ncbi/blast
+        workingDir: /blast/blastdb
+        volumeMounts:
+        - name: blast-dbs
+          mountPath: /blast/blastdb
+          readOnly: true
+        command: [ "blastdbcmd", "-list", "/blast/blastdb", "-remove_redundant_dbs" ]
+      restartPolicy: Never
+  backoffLimit: 3
