@@ -39,7 +39,7 @@ all_gcp: create_cluster deploy show check
 
 .PHONY: k8s
 k8s:
-	kubectl get pv,pvc,job,pod,deploy,svc,sc -o wide 
+	-kubectl get pv,pvc,job,pod,deploy,svc,sc -o wide 
 
 .PHONY: init
 init:
@@ -65,7 +65,7 @@ create_cluster: init
 deploy: specs/pvc.yaml specs/job-init-pv.yaml
 	kubectl apply -f <(grep -v storageClassName $<)
 	kubectl apply -f specs/job-init-pv.yaml
-	kubectl wait --for=condition=complete -f specs/job-init-pv.yaml
+	time kubectl wait --for=condition=complete -f specs/job-init-pv.yaml --timeout=3m
 	kubectl apply -f specs/svc.yaml
 	kubectl apply -f specs/deployment.yaml
 
@@ -81,7 +81,6 @@ check:
 	kubectl apply -f specs/job-show-blastdbs.yaml
 	kubectl wait --for=condition=complete -f specs/job-show-blastdbs.yaml
 	kubectl get pod -o name -l app=test | xargs -t -I{} -n1 kubectl logs {} --timestamps
-	curl -s "http://$(shell kubectl get svc ${SERVICE_NAME} -o json | jq -r '.status.loadBalancer.ingress[0] | .hostname, .ip' | grep -v null)/cgi-bin/blast.cgi?CMD=DisplayRIDs"
 
 logs:
 	kubectl get pod -o name -l app=setup | xargs -t -I{} -n1 kubectl logs {} --timestamps
