@@ -33,7 +33,7 @@ all: deploy check
 	make k8s
 	echo "Don't forget to run make clean to clean up"
 
-all_gcp: create_cluster deploy show check
+all_gcp: create_cluster deploy_gcp show check
 	make k8s
 	echo "Don't forget to run make distclean to clean up"
 
@@ -69,6 +69,16 @@ deploy: specs/pvc.yaml specs/job-init-pv.yaml
 	kubectl apply -f specs/svc.yaml
 	kubectl apply -f specs/deployment.yaml
 
+# order matters so that resources are created properly
+.PHONY: deploy_gcp
+deploy_gcp: specs/pvc.yaml specs/job-init-pv.yaml
+	kubectl apply -f specs/storage-gcp.yaml
+	kubectl apply -f $<
+	kubectl apply -f specs/job-init-pv.yaml
+	time kubectl wait --for=condition=complete -f specs/job-init-pv.yaml --timeout=3m
+	kubectl apply -f specs/svc.yaml
+	kubectl apply -f specs/deployment.yaml
+
 # Show the cluster's primary IP address
 # FIXME: allow hostaname, if IP is null
 .PHONY: ip
@@ -86,6 +96,14 @@ logs:
 	kubectl get pod -o name -l app=setup | xargs -t -I{} -n1 kubectl logs {} --timestamps
 	kubectl get pod -o name -l app=test | xargs -t -I{} -n1 kubectl logs {} --timestamps
 	kubectl get pod -o name -l app=webblast | xargs -t -I{} -n1 kubectl logs {} --timestamps
+
+#clean2:
+#	-kubectl delete -f specs/job-init-pv.yaml
+#	-kubectl delete -f specs/job-show-blastdbs.yaml
+#	-kubectl delete -f specs/deployment.yaml
+#	-kubectl delete -f specs/svc.yaml
+#	-kubectl delete -f specs/pvc.yaml
+#	${RM} specs/job-init-pv.yaml specs/pvc.yaml
 
 clean:
 	-kubectl delete -f specs
